@@ -24,9 +24,9 @@ class UserService:
         entity = self.user_repository.find_user_by_email(email)
 
         if entity is False:
-            return False
+            return -1
 
         if entity.password == password:
-            return True
+            return entity.id
 
-        return False
+        return -1

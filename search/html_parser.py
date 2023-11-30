@@ -3,9 +3,9 @@ from bs4 import BeautifulSoup
 
 
 def parse_html(request):
-    splits = request['link'].split("/")
+    splits = request.link.split("/")
     post_id = splits[-1]
-    post_url = f"https://blog.naver.com/PostView.naver?blogId={request['bloggerId']}&logNo={post_id}"
+    post_url = f"https://blog.naver.com/PostView.naver?blogId={request.bloggername}&logNo={post_id}"
 
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '

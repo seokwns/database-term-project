@@ -34,8 +34,19 @@ def parse_json(response):
         bloggername = item['bloggername']
         bloggerlink = item['bloggerlink']
         postdate = item['postdate']
+        advertisement = False
+        confidence = 0
 
-        blog_post = BlogPostDTO(title, link, description, bloggername, bloggerlink, postdate)
+        blog_post = BlogPostDTO(
+            title,
+            link,
+            description,
+            bloggername,
+            bloggerlink,
+            postdate,
+            advertisement,
+            confidence
+        )
         blog_posts.append(blog_post)
 
     return blog_posts

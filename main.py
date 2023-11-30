@@ -15,6 +15,8 @@ if __name__ == '__main__':
 
     user_service = UserService(connection, cursor)
 
+    user_id = -1
+
     while True:
         print()
         print("------------------------------")
@@ -23,7 +25,7 @@ if __name__ == '__main__':
         print("1. 회원가입")
         print("2. 로그인")
         print("3. 맛집 검색하기")
-        print("4. 책갈피 목록 보기")
+        print("4. 북마크 목록 보기")
         print("5. Exit")
         print()
         print("------------------------------")
@@ -71,9 +73,9 @@ if __name__ == '__main__':
             email = input(" > email: ")
             password = input(" > password: ")
 
-            logined = user_service.login(email, password)
+            user_id = user_service.login(email, password)
 
-            if logined:
+            if user_id > 0:
                 print()
                 print("------------------------------")
                 print()
@@ -105,23 +107,68 @@ if __name__ == '__main__':
 
             keyword = input(" > keyword: ")
             number = int(input(" > 페이지: "))
-            search_response = search_keyword(keyword, cursor, keyword, number)
-            for response in search_response:
-                print()
-                print(response.title)
-                print(response.description)
-                print(response.link)
-                print(response.bloggername)
-                print(response.postdate)
-                print()
 
-            print("포스트를 선택해주세요!")
+            while True:
+                print("검색 중입니다. 잠시만 기다려 주세요 .....")
+                search_response = search_keyword(keyword, cursor, keyword, number)
+                for (idx, value) in enumerate(search_response):
+                    print()
+                    print(f"{idx + 1}.")
+                    print("title :", value.title)
+                    print("description :", value.description)
+                    print("link :", value.link)
+                    print("date :", value.postdate)
+                    print("advertisement :", value.advertisement)
+                    print("confidence :", value.confidence)
+                    print()
+
+                go_back = False
+
+                while True:
+                    print()
+                    print("[ 검색 메뉴 ]")
+                    print()
+                    print("1. 다음 페이지 보기")
+                    print("2. 북마크 추가하기")
+                    print("3. 메인 메뉴로 돌아가기")
+                    print()
+                    menu_iter = int(input(" > "))
+
+                    if menu_iter == 1:
+                        number += 1
+                        break
+                    elif menu_iter == 2:
+                        print("포스트 번호를 입력해주세요. (1~10)")
+
+                        while True:
+                            post_idx = int(input(" > "))
+
+                            if 1 <= post_idx <= 10:
+                                selected_post = search_response[post_idx - 1]
+                                bookmark_service.save(selected_post, user_id)
+                                print("북마크 등록을 완료했습니다.")
+                                break
+                            else:
+                                print("1 ~ 10 사이의 번호를 입력해주세요.")
+                    elif menu_iter == 3:
+                        go_back = True
+                        break
+                    else:
+                        print("1 ~ 3 사이의 번호를 입력해주세요.")
+
+                if go_back is True:
+                    break
 
         elif itr == 4:
+            if user_id < 1:
+                print("로그인 후 이용 가능합니다.")
+                print("로그인을 해주세요")
+                continue
+
             print()
             print("------------------------------")
             print()
-            print("[ 책갈피 목록 보기 ] ")
+            print("[ 북마크 목록 보기 ] ")
             print()
             print("------------------------------")
             print()
