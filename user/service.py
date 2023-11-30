@@ -18,10 +18,10 @@ class UserService:
             print("이메일 형식으로 작성해주세요.")
             return
 
-        self.user_repository.saveUser(email, name, password)
+        self.user_repository.save_user(email, name, password)
 
     def login(self, email, password):
-        entity = self.user_repository.findUserByEmail(email)
+        entity = self.user_repository.find_user_by_email(email)
 
         if entity is False:
             return False

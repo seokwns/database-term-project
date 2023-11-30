@@ -8,17 +8,13 @@ class UserRepository:
         self.cursor = cursor
         self.create()
 
-    def set_schema(self):
-        self.cursor.execute('set search_path to matzip;')
-
     def create(self):
         sql = '''
                 CREATE TABLE IF NOT EXISTS user_tb (
                     id         SERIAL           PRIMARY KEY,
                     email      VARCHAR(100)     UNIQUE NOT NULL,
                     name       VARCHAR(10)      NOT NULL,
-                    password   VARCHAR(30)      NOT NULL,
-                    role       VARCHAR(10)      NOT NULL
+                    password   VARCHAR(30)      NOT NULL
                 );
         '''
 
@@ -40,16 +36,16 @@ class UserRepository:
 
         return True
 
-    def saveUser(self, email, name, password):
+    def save_user(self, email, name, password):
         sql = '''
-                insert into user_tb (email, name, password, role)
-                values (%s, %s, %s, %s)
+                insert into user_tb (email, name, password)
+                values (%s, %s, %s)
         '''
 
-        self.cursor.execute(sql, (f"{email}", f"{name}", f"{password}", "role_user",))
+        self.cursor.execute(sql, (f"{email}", f"{name}", f"{password}",))
         self.connection.commit()
 
-    def findUserByEmail(self, email):
+    def find_user_by_email(self, email):
         sql = '''
                 select *
                 from user_tb u

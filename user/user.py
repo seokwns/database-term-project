@@ -4,4 +4,3 @@ class User:
         self.email = record[1]
         self.name = record[2]
         self.password = record[3]
-        self.role = record[4]
