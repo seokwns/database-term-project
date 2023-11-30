@@ -1,5 +1,6 @@
 import psycopg2
 from user.service import UserService
+from search.naver import search_keyword
 
 if __name__ == '__main__':
     connection = psycopg2.connect(
@@ -22,14 +23,13 @@ if __name__ == '__main__':
         print("1. 회원가입")
         print("2. 로그인")
         print("3. 맛집 검색하기")
-        print("4. 좋아요 목록 보기")
-        print("5. 작성한 리뷰 보기")
-        print("6. Exit")
+        print("4. 책갈피 목록 보기")
+        print("5. Exit")
         print()
         print("------------------------------")
         print()
 
-        itr = int(input("> "))
+        itr = int(input(" > "))
 
         if itr == 1:
             print()
@@ -42,10 +42,9 @@ if __name__ == '__main__':
             print("------------------------------")
             print()
 
-            email = input("email: ")
-            name = input("name: ")
-            password = input("password: ")
-
+            email = input(" > email: ")
+            name = input(" > name: ")
+            password = input(" > password: ")
             user_service.register(email, name, password)
 
             print()
@@ -69,8 +68,8 @@ if __name__ == '__main__':
             print("------------------------------")
             print()
 
-            email = input("email: ")
-            password = input("password: ")
+            email = input(" > email: ")
+            password = input(" > password: ")
 
             logined = user_service.login(email, password)
 
@@ -95,10 +94,46 @@ if __name__ == '__main__':
 
         elif itr == 3:
             print()
+            print("------------------------------")
+            print()
+            print("[ 맛집 검색하기 ]")
+            print()
+            print("키워드를 입력해주세요!")
+            print()
+            print("------------------------------")
+            print()
+
+            keyword = input(" > keyword: ")
+            number = int(input(" > 페이지: "))
+            search_response = search_keyword(keyword, cursor, keyword, number)
+            for response in search_response:
+                print()
+                print(response.title)
+                print(response.description)
+                print(response.link)
+                print(response.bloggername)
+                print(response.postdate)
+                print()
+
+            print("포스트를 선택해주세요!")
+
         elif itr == 4:
             print()
+            print("------------------------------")
             print()
-            print("Bye")
+            print("[ 책갈피 목록 보기 ] ")
+            print()
+            print("------------------------------")
+            print()
+
+        elif itr == 5:
+            print()
+            print("------------------------------")
+            print()
+            print("[ Bye ]")
+            print()
+            print("------------------------------")
+            print()
             break
 
     cursor.close()
