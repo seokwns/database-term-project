@@ -1,6 +1,7 @@
 import psycopg2
 from user.service import UserService
 from search.naver import search_keyword
+from bookmark.service import BookmarkService
 
 if __name__ == '__main__':
     connection = psycopg2.connect(
@@ -14,6 +15,7 @@ if __name__ == '__main__':
     cursor = connection.cursor()
 
     user_service = UserService(connection, cursor)
+    bookmark_service = BookmarkService(connection, cursor)
 
     user_id = -1
 
@@ -40,14 +42,21 @@ if __name__ == '__main__':
             print("[ 회원가입 ]")
             print()
             print("회원가입 정보를 기입해주세요.")
+            print("- 이름은 2글자 이상, 10글자 이하만 가능합니다.")
+            print("- 비밀번호는 영문자, 숫자, 특수문자 포함 8글자 이상, 30글자 이하만 가능합니다.")
             print()
             print("------------------------------")
             print()
 
-            email = input(" > email: ")
-            name = input(" > name: ")
-            password = input(" > password: ")
-            user_service.register(email, name, password)
+            while True:
+                email = input(" > email: ")
+                name = input(" > name: ")
+                password = input(" > password: ")
+
+                registered = user_service.register(email, name, password)
+
+                if registered is True:
+                    break
 
             print()
             print("------------------------------")
@@ -172,6 +181,36 @@ if __name__ == '__main__':
             print()
             print("------------------------------")
             print()
+
+            page = 1
+            while True:
+                bookmarks = bookmark_service.find(user_id, page)
+                for (idx, value) in enumerate(bookmarks):
+                    print()
+                    print(f'{idx + 1}.')
+                    print("url :", value.url)
+                    print("title :", value.title)
+                    print()
+
+                print()
+                print("[ 북마크 메뉴 ]")
+                print()
+                print("1. 다음 페이지 보기")
+                print("2. 북마크 삭제하기")
+                print("3. 메인 메뉴로 돌아가기")
+                print()
+
+                menu_iter = int(input(" > "))
+
+                if menu_iter == 1:
+                    page = 2
+                    continue
+                elif menu_iter == 2:
+                    print("삭제할 북마크 번호를 입력해주세요. (1~10")
+                    bookmark_idx = int(input(" > "))
+
+                elif menu_iter == 3:
+                    break
 
         elif itr == 5:
             print()
