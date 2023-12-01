@@ -6,21 +6,13 @@ class BookmarkRepository:
         self.create()
 
     def create(self):
-        # 유저가 탈퇴하면 정보가 사라지고, 북마크 정보 또한 사라져야 합니다.
-        # 따라서 cascade 옵션을 추가합니다.
-
-        # 북마크는 중복되어 추가할 수 없습니다.
-        # 따라서 유저와 url을 함께 unique 제약조건을 추가합니다.
-
-        # 또한 북마크를 추가할 때는 유저 아이디 + url이며
-        # 북마크 목록을 조회할 때는 유저 아이디만 가지고 조회하므로
-        # user_id, url 순서로 인덱스를 추가합니다.
         sql = '''
                 CREATE TABLE IF NOT EXISTS bookmark_tb (
                     id	        SERIAL          PRIMARY KEY,
                     url 	    VARCHAR(200)	NOT NULL,
                     title       VARCHAR(200)    NOT NULL,
                     user_id	    INTEGER      	NOT NULL,
+                    created_at  TIMESTAMP       NOT NULL,
                     
                     CONSTRAINT fk_user_bookmark
                         FOREIGN KEY (user_id)
@@ -28,10 +20,11 @@ class BookmarkRepository:
                         ON DELETE CASCADE,
                         
                     CONSTRAINT uc_user_url 
-                        UNIQUE (user_id, url),
-                        
-                    INDEX idx_user_id_url (user_id, url)
+                        UNIQUE (user_id, url)
                 );
+                
+                CREATE INDEX ON bookmark_tb (user_id, url);
+                CREATE INDEX ON bookmark_tb (url);
         '''
 
         self.cursor.execute(sql)
@@ -39,23 +32,105 @@ class BookmarkRepository:
 
     def save(self, post, user_id):
         sql = '''
-                insert into bookmark_tb (url, title, user_id)
-                values (%s, %s, %s)
+                insert into bookmark_tb (url, title, user_id, created_at)
+                values (%s, %s, %s, CURRENT_TIMESTAMP)
         '''
 
         url = post.link
         title = post.title
-        self.cursor.execute(sql, (f'{url}', f'{title}', f'{user_id}', ))
+        self.cursor.execute(sql, (url, title, user_id))
         self.connection.commit()
+
+        sql = '''
+                select b.id
+                from bookmark_tb b
+                where user_id = %s and url = %s
+        '''
+
+        self.cursor.execute(sql, (user_id, url))
+        return self.cursor.fetchone()
 
     def find(self, user_id, page):
         sql = '''
                 select *
-                from bookmark_tb
-                where user_id = %s
+                from bookmark_tb b
+                left outer join memo_tb m on b.id = m.bookmark_id
+                where b.user_id = %s
                 limit 5
                 offset %s
         '''
 
-        self.cursor.execute(sql, (f'{user_id}', f'{page}', ))
-        return self.connection.fetchall()
+        self.cursor.execute(sql, (user_id, page))
+        return self.cursor.fetchall()
+
+    def find_all_by_urls_in(self, urls):
+        url_str = ','.join(map(lambda x: f"'{x}'", urls))
+
+        sql = f'''
+                        select url, count(url)
+                        from bookmark_tb
+                        where url in ({url_str})
+                        group by url
+                '''
+
+        self.cursor.execute(sql)
+        return self.cursor.fetchall()
+
+    def find_order_by_date(self, user_id, page):
+        sql = '''
+                select *
+                from bookmark_tb b
+                left outer join memo_tb m on b.id = m.bookmark_id
+                where b.user_id = %s
+                order by b.created_at desc
+                limit 5
+                offset %s               
+        '''
+
+        self.cursor.execute(sql, (user_id, page))
+        return self.cursor.fetchall()
+
+    def find_in_title(self, user_id, keyword):
+        sql = '''
+                        select *
+                        from bookmark_tb b
+                        left outer join memo_tb m on b.id = m.bookmark_id
+                        where b.user_id = %s and b.title like %s
+                        order by b.created_at desc
+                '''
+
+        self.cursor.execute(sql, (user_id, f'{"%" + keyword + "%"}', ))
+        return self.cursor.fetchall()
+
+    def find_in_title_and_memo(self, user_id, keyword):
+        sql = '''
+                        select *
+                        from bookmark_tb b
+                        left outer join memo_tb m on b.id = m.bookmark_id
+                        where b.user_id = %s 
+                            and (b.title like %s or m.content like %s)
+                        order by b.created_at desc
+                '''
+
+        self.cursor.execute(sql, (user_id, f'{"%" + keyword + "%"}', f'{"%" + keyword + "%"}', ))
+        return self.cursor.fetchall()
+
+    def delete(self, user_id, url):
+        sql = '''
+                begin;
+                
+                delete from memo_tb m
+                where m.bookmark_id in (
+                    select b.id
+                    from bookmark_tb b
+                    where b.user_id = %s and b.url = %s
+                );
+                
+                delete from bookmark_tb
+                where user_id = %s and url = %s;
+                
+                commit;
+        '''
+
+        self.cursor.execute(sql, (user_id, url, user_id, url))
+        self.connection.commit()

@@ -39,3 +39,6 @@ class UserService:
             return entity.id
 
         return -1
+
+    def delete(self, user_id):
+        self.user_repository.delet_user(user_id)
