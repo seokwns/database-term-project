@@ -38,7 +38,7 @@ class BookmarkRepository:
 
         url = post.link
         title = post.title
-        self.cursor.execute(sql, (url, title, user_id))
+        self.cursor.execute(sql, (url, title, user_id, ))
         self.connection.commit()
 
         sql = '''
@@ -47,7 +47,7 @@ class BookmarkRepository:
                 where user_id = %s and url = %s
         '''
 
-        self.cursor.execute(sql, (user_id, url))
+        self.cursor.execute(sql, (user_id, url, ))
         return self.cursor.fetchone()
 
     def find(self, user_id, page):
@@ -60,18 +60,18 @@ class BookmarkRepository:
                 offset %s
         '''
 
-        self.cursor.execute(sql, (user_id, page))
+        self.cursor.execute(sql, (user_id, page, ))
         return self.cursor.fetchall()
 
     def find_all_by_urls_in(self, urls):
         url_str = ','.join(map(lambda x: f"'{x}'", urls))
 
         sql = f'''
-                        select url, count(url)
-                        from bookmark_tb
-                        where url in ({url_str})
-                        group by url
-                '''
+                select url, count(url)
+                from bookmark_tb
+                where url in ({url_str})
+                group by url
+        '''
 
         self.cursor.execute(sql)
         return self.cursor.fetchall()
@@ -87,30 +87,30 @@ class BookmarkRepository:
                 offset %s               
         '''
 
-        self.cursor.execute(sql, (user_id, page))
+        self.cursor.execute(sql, (user_id, page, ))
         return self.cursor.fetchall()
 
     def find_in_title(self, user_id, keyword):
         sql = '''
-                        select *
-                        from bookmark_tb b
-                        left outer join memo_tb m on b.id = m.bookmark_id
-                        where b.user_id = %s and b.title like %s
-                        order by b.created_at desc
-                '''
+                select *
+                from bookmark_tb b
+                left outer join memo_tb m on b.id = m.bookmark_id
+                where b.user_id = %s and b.title like %s
+                order by b.created_at desc
+        '''
 
         self.cursor.execute(sql, (user_id, f'{"%" + keyword + "%"}', ))
         return self.cursor.fetchall()
 
     def find_in_title_and_memo(self, user_id, keyword):
         sql = '''
-                        select *
-                        from bookmark_tb b
-                        left outer join memo_tb m on b.id = m.bookmark_id
-                        where b.user_id = %s 
-                            and (b.title like %s or m.content like %s)
-                        order by b.created_at desc
-                '''
+                select *
+                from bookmark_tb b
+                left outer join memo_tb m on b.id = m.bookmark_id
+                where b.user_id = %s 
+                    and (b.title like %s or m.content like %s)
+                order by b.created_at desc
+        '''
 
         self.cursor.execute(sql, (user_id, f'{"%" + keyword + "%"}', f'{"%" + keyword + "%"}', ))
         return self.cursor.fetchall()
@@ -132,5 +132,5 @@ class BookmarkRepository:
                 commit;
         '''
 
-        self.cursor.execute(sql, (user_id, url, user_id, url))
+        self.cursor.execute(sql, (user_id, url, user_id, url, ))
         self.connection.commit()

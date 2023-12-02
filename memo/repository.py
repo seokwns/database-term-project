@@ -7,11 +7,11 @@ class MemoRepository:
     def create(self):
         sql = '''
                 CREATE TABLE IF NOT EXISTS memo_tb (
-                    id SERIAL PRIMARY KEY,
-                    user_id INTEGER NOT NULL,
-                    bookmark_id INTEGER NOT NULL,
-                    content VARCHAR(500) NOT NULL,
-                    created_at TIMESTAMP NOT NULL,
+                    id          SERIAL          PRIMARY KEY,
+                    user_id     INTEGER         NOT NULL,
+                    bookmark_id INTEGER NOT     NULL,
+                    content     VARCHAR(500)    NOT NULL,
+                    created_at  TIMESTAMP       NOT NULL,
                     
                     CONSTRAINT fk_memo_bookmark
                         FOREIGN KEY (bookmark_id)
@@ -35,7 +35,8 @@ class MemoRepository:
                 insert into memo_tb (user_id, bookmark_id, content, created_at) 
                 values (%s, %s, %s, CURRENT_TIMESTAMP)
         '''
-        self.cursor.execute(sql, (user_id, bookmark_id, content))
+
+        self.cursor.execute(sql, (user_id, bookmark_id, content, ))
         self.connection.commit()
 
     def update(self, user_id, url, content):
@@ -48,5 +49,6 @@ class MemoRepository:
                     where user_id = %s and url = %s
                 );
         '''
-        self.cursor.execute(sql, (content, user_id, user_id, url))
+
+        self.cursor.execute(sql, (content, user_id, user_id, url, ))
         self.connection.commit()

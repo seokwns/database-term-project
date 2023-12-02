@@ -30,7 +30,7 @@ class UserRepository:
                 where u.email like %s
         '''
 
-        self.cursor.execute(sql, (f"%{email}%",))
+        self.cursor.execute(sql, (email, ))
         result = int(self.cursor.fetchone()[0])
 
         if result >= 1:
@@ -44,7 +44,7 @@ class UserRepository:
                 values (%s, %s, %s)
         '''
 
-        self.cursor.execute(sql, (f"{email}", f"{name}", f"{password}",))
+        self.cursor.execute(sql, (email, name, password, ))
         self.connection.commit()
 
     def find_user_by_email(self, email):
@@ -54,7 +54,7 @@ class UserRepository:
                 where u.email like %s
         '''
 
-        self.cursor.execute(sql, (f"%{email}%",))
+        self.cursor.execute(sql, (email, ))
         record = self.cursor.fetchone()
 
         if record is None:
@@ -62,30 +62,33 @@ class UserRepository:
 
         return User(record)
 
-    def delet_user(self, user_id):
-        # 북마크 정보와 유저 정보를 삭제해야 합니다.
-        # cascade 옵션이 있지만, 명시적으로 삭제를 진행합니다.
-        # 두 테이블에서 삭제가 진행됩니다.
-        # 따라서 오류 발생 시, 롤백을 해야 하므로 트랜잭션을 열어줍니다.
-        sql = '''
-                begin;
-                
-                with bookmark_ids as (
-                    select b.id
-                    from bookmark_tb b
-                    where b.user_id = %s
-                )
-                delete from memo_tb m
-                where m.bookmark_id in (select id from bookmark_ids);
-                
-                delete from bookmark_tb
-                where user_id = %s;
-                
-                delete from user_tb
-                where id = %s;
-                
-                commit;
-        '''
+    def delete_user(self, user_id):
+        try:
+            self.connection.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_SERIALIZABLE)
 
-        self.cursor.execute(sql, (f'{user_id}', f'{user_id}', f'{user_id}', ))
-        self.connection.commit()
+            sql = '''
+                    begin;
+                    
+                    with bookmark_ids as (
+                        select b.id
+                        from bookmark_tb b
+                        where b.user_id = %s
+                    )
+                    delete from memo_tb m
+                    where m.bookmark_id in (select id from bookmark_ids);
+                    
+                    delete from bookmark_tb
+                    where user_id = %s;
+                    
+                    delete from user_tb
+                    where id = %s;
+                    
+                    commit;
+            '''
+
+            self.cursor.execute(sql, (user_id, user_id, user_id, ))
+            self.connection.commit()
+
+        except Exception as e:
+            self.connection.rollback()
+            raise e

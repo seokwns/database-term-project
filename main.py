@@ -150,7 +150,7 @@ if __name__ == '__main__':
                     print("1. 다음 페이지 보기")
                     print("2. 이전 페이지 보기")
                     print("3. 북마크 추가하기")
-                    print("4. 메인 메뉴로 돌아가기")
+                    print("4. 뒤로가기")
                     menu_iter = int(input(" > "))
 
                     if menu_iter == 1:
@@ -176,6 +176,7 @@ if __name__ == '__main__':
                             if 1 <= post_idx <= 10:
                                 selected_post = search_response[post_idx - 1]
                                 bookmark_id = bookmark_service.save(selected_post, user_id)
+
                                 print("북마크 등록을 완료했습니다.")
                                 print("메모를 남기시겠습니까?")
                                 print("1. Yes")
@@ -218,7 +219,7 @@ if __name__ == '__main__':
                 print("2. 최근에 추가한 순서로 보기")
                 print("3. 제목에서 검색하기")
                 print("4. 제목과 메모에서 검색하기")
-                print("5. 메뉴로 돌아가기")
+                print("5. 뒤로가기")
                 print("------------------------------")
 
                 bookmark_iter = int(input(" > "))
@@ -250,7 +251,7 @@ if __name__ == '__main__':
                         print("2. 이전 페이지 보기")
                         print("3. 북마크 삭제하기")
                         print("4. 메모 수정하기")
-                        print("5. 메인 메뉴로 돌아가기")
+                        print("5. 뒤로가기")
                         menu_iter = int(input(" > "))
 
                         if menu_iter == 1:
@@ -313,12 +314,17 @@ if __name__ == '__main__':
 
                     if bookmark_iter == 3:
                         responses = bookmark_service.find_in_title(user_id, keyword)
+
+                        if len(responses) == 0:
+                            print("해당 키워드가 포함된 북마크가 존재하지 않습니다.")
+                            continue
+
                     elif bookmark_iter == 4:
                         responses = bookmark_service.find_in_title_and_memo(user_id, keyword)
 
-                    if len(responses) == 0:
-                        print("북마크 목록이 존재하지 않습니다.")
-                        break
+                        if len(responses) == 0:
+                            print("해당 키워드가 포함된 북마크 혹은 메모가 존재하지 않습니다.")
+                            continue
 
                     for (idx, value) in enumerate(responses):
                         print()
