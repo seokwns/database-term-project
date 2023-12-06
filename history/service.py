@@ -23,8 +23,6 @@ class HistoryService:
     def find_by_user_id_and_keyword(self, user_id, keyword, page):
         results = self.history_repository.find_by_user_id_and_keyword(user_id, keyword, page)
 
-        print(results)
-
         histories = []
         for result in results:
             histories.append(History(result[1], result[2], result[3], result[4]))
