@@ -80,13 +80,16 @@ class UserRepository:
                     delete from bookmark_tb
                     where user_id = %s;
                     
+                    delete from history_tb
+                    where user_id = %s;
+                    
                     delete from user_tb
                     where id = %s;
                     
                     commit;
             '''
 
-            self.cursor.execute(sql, (user_id, user_id, user_id, ))
+            self.cursor.execute(sql, (user_id, user_id, user_id, user_id, ))
             self.connection.commit()
 
         except Exception as e:

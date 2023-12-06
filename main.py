@@ -1,8 +1,10 @@
 import psycopg2
+import webbrowser
 from user.service import UserService
 from search.naver import search_keyword
 from bookmark.service import BookmarkService
 from memo.service import MemoService
+from history.service import HistoryService
 
 
 def format_date_string(input_string):
@@ -27,6 +29,7 @@ if __name__ == '__main__':
     user_service = UserService(connection, cursor)
     bookmark_service = BookmarkService(connection, cursor)
     memo_service = MemoService(connection, cursor)
+    history_service = HistoryService(connection, cursor)
 
     user_id = -1
 
@@ -46,11 +49,30 @@ if __name__ == '__main__':
             print("1. 로그아웃")
             print("2. 맛집 검색하기")
             print("3. 북마크 목록")
-            print("4. 회원 탈퇴")
-            print("5. Exit")
+            print("4. 검색 기록 보기")
+            print("5. 회원 탈퇴")
+            print("6. Exit")
             print("------------------------------")
 
-        itr = int(input(" > "))
+        itr = 0
+        while True:
+            try:
+                itr = int(input(" > "))
+                if user_id < 0:
+                    if 1 <= itr <= 4:
+                        break
+                    else:
+                        print("1~4 사이 숫자를 입력해주세요.")
+                else:
+                    if 1 <= itr <= 6:
+                        break
+                    else:
+                        print("1~6 사이 숫자를 입력해주세요.")
+            except ValueError:
+                if user_id < 0:
+                    print("1~4 사이 숫자를 입력해주세요.")
+                else:
+                    print("1~6 사이 숫자를 입력해주세요.")
 
         if user_id > 0 and itr == 1:
             user_id = -1
@@ -102,20 +124,32 @@ if __name__ == '__main__':
                 print("------------------------------")
 
         elif (user_id < 0 and itr == 3) or (user_id > 0 and itr == 2):
+            keyword = ""
+            number = 1
+
             print("------------------------------")
             print("[ 맛집 검색하기 ]")
             print()
             print("키워드를 입력해주세요!")
             print("------------------------------")
-            keyword = input(" > keyword: ")
-            number = int(input(" > 페이지: "))
 
-            if number < 1:
-                number = 1
+            while True:
+                try:
+                    keyword = input(" > keyword: ")
+                    number = int(input(" > 페이지: "))
+                    if 1 <= number:
+                        break
+                    else:
+                        print("페이지는 1 이상의 숫자만 입력해주세요.")
+                except ValueError:
+                    print("잘못된 입력입니다.")
+                    print("페이지는 숫자만 입력 가능합니다.")
+                    continue
 
             while True:
                 print("검색 중입니다. 잠시만 기다려 주세요 .....")
                 print()
+                history_service.save(user_id, keyword, number)
                 search_response = search_keyword(keyword, cursor, keyword, number)
 
                 urls = []
@@ -149,9 +183,20 @@ if __name__ == '__main__':
                     print()
                     print("1. 다음 페이지 보기")
                     print("2. 이전 페이지 보기")
-                    print("3. 북마크 추가하기")
-                    print("4. 뒤로가기")
-                    menu_iter = int(input(" > "))
+                    print("3. URL 열기")
+                    print("4. 북마크 추가하기")
+                    print("5. 뒤로가기")
+                    menu_iter = 0
+
+                    while True:
+                        try:
+                            menu_iter = int(input(" > "))
+                            if 1 <= menu_iter <= 5:
+                                break
+                            else:
+                                print("1~5 사이 숫자를 입력해주세요.")
+                        except ValueError:
+                            print("1~5 사이 숫자를 입력해주세요.")
 
                     if menu_iter == 1:
                         number += 1
@@ -164,43 +209,56 @@ if __name__ == '__main__':
                         break
 
                     elif menu_iter == 3:
+                        print("오픈할 URL을 선택하세요.")
+
+                        while True:
+                            try:
+                                url_idx = int(input(" > "))
+                                opened_post = search_response[url_idx - 1]
+                                webbrowser.open_new(opened_post.url)
+                                break
+                            except ValueError:
+                                print("1~10 사이 숫자를 입력해주세요.")
+                                continue
+
+                    elif menu_iter == 4:
                         if user_id < 0:
                             print("로그인 후 이용 가능합니다.")
                             continue
 
                         print("포스트 번호를 입력해주세요. (1~10)")
 
+                        post_idx = 0
+
                         while True:
-                            post_idx = int(input(" > "))
+                            try:
+                                post_idx = int(input(" > "))
+                                if 1 <= post_idx <= 10:
+                                    break
+                                else:
+                                    print("1~10 사이 숫자를 입력해주세요.")
+                            except ValueError:
+                                print("1~10 사이 숫자를 입력해주세요.")
 
-                            if 1 <= post_idx <= 10:
-                                selected_post = search_response[post_idx - 1]
-                                bookmark_id = bookmark_service.save(selected_post, user_id)
+                        selected_post = search_response[post_idx - 1]
+                        bookmark_id = bookmark_service.save(selected_post, user_id)
 
-                                print("북마크 등록을 완료했습니다.")
-                                print("메모를 남기시겠습니까?")
-                                print("1. Yes")
-                                print("2. No")
-                                memo_iter = int(input(" > "))
+                        print("북마크 등록을 완료했습니다.")
+                        print("메모를 남기시겠습니까?")
+                        print("1. Yes")
+                        print("2. No")
+                        memo_iter = int(input(" > "))
 
-                                if memo_iter == 1:
-                                    content = input(" > content: ")
-                                    memo_service.save(user_id, bookmark_id, content)
-                                    print()
-                                    print("저장 완료")
-                                    print()
+                        if memo_iter == 1:
+                            content = input(" > content: ")
+                            memo_service.save(user_id, bookmark_id, content)
+                            print()
+                            print("저장 완료")
+                            print()
 
-                                break
-
-                            else:
-                                print("1 ~ 10 사이의 번호를 입력해주세요.")
-
-                    elif menu_iter == 4:
+                    elif menu_iter == 5:
                         go_back = True
                         break
-
-                    else:
-                        print("1 ~ 4 사이의 번호를 입력해주세요.")
 
                 if go_back is True:
                     break
@@ -222,7 +280,17 @@ if __name__ == '__main__':
                 print("5. 뒤로가기")
                 print("------------------------------")
 
-                bookmark_iter = int(input(" > "))
+                bookmark_iter = 0
+
+                while True:
+                    try:
+                        bookmark_iter = int(input(" > "))
+                        if 1 <= bookmark_iter <= 5:
+                            break
+                        else:
+                            print("1~5 사이 숫자를 입력해주세요.")
+                    except ValueError:
+                        print("1~5 사이 숫자를 입력해주세요.")
 
                 if bookmark_iter == 1 or bookmark_iter == 2:
                     page = 0
@@ -250,7 +318,7 @@ if __name__ == '__main__':
                         print("1. 다음 페이지 보기")
                         print("2. 이전 페이지 보기")
                         print("3. 북마크 삭제하기")
-                        print("4. 메모 수정하기")
+                        print("4. 메모 추가/수정하기")
                         print("5. 뒤로가기")
                         menu_iter = int(input(" > "))
 
@@ -271,7 +339,8 @@ if __name__ == '__main__':
                                 bookmark_idx = int(input(" > "))
 
                                 if 1 <= bookmark_idx <= 10:
-                                    bookmark_url = bookmarks[bookmark_idx - 1].url
+                                    selected_bookmark = bookmarks[bookmark_idx - 1]
+                                    bookmark_url = selected_bookmark.url
                                     bookmark_service.delete(user_id, bookmark_url)
                                     break
 
@@ -338,6 +407,72 @@ if __name__ == '__main__':
                     break
 
         elif user_id > 0 and itr == 4:
+            page = 0
+            while True:
+                print("[ 검색기록 메뉴 ]")
+                print()
+                print("1. 기록 보기")
+                print("2. 키워드로 검색하기")
+                print("3. 뒤로가기")
+
+                history_menu_iter = 1
+                while True:
+                    try:
+                        history_menu_iter = int(input(" > "))
+                        break
+                    except ValueError:
+                        print("1~4 사이 숫자만 입력해주세요.")
+                        continue
+
+                if history_menu_iter == 1 or history_menu_iter == 2:
+                    page = 0
+                    while True:
+                        histories = []
+
+                        if history_menu_iter == 1:
+                            histories = history_service.find_by_user_id(user_id, page)
+                        elif history_menu_iter == 2:
+                            history_keyword = input(" > keyword : ")
+                            histories = history_service.find_by_user_id_and_keyword(user_id, history_keyword, page)
+
+                        for (idx, value) in enumerate(histories):
+                            print()
+                            print(f'{idx + 1}.')
+                            print("키워드 =", value.keyword)
+                            print("페이지 =", value.page)
+                            print("날짜 =", value.searched_at)
+
+                        print("[ 검색기록 메뉴 ]")
+                        print()
+                        print("1. 다음 페이지 보기")
+                        print("2. 이전 페이지 보기")
+                        print("3. 뒤로가기")
+
+                        history_menu_iter2 = 0
+                        while True:
+                            try:
+                                history_menu_iter2 = int(input(" > "))
+                                if 1 <= history_menu_iter2 <= 3:
+                                    break
+                                else:
+                                    print("1~3 사이 숫자만 입력해주세요.")
+                            except ValueError:
+                                print("1~3 사이 숫자만 입력해주세요.")
+                                continue
+
+                        if history_menu_iter2 == 1:
+                            page += 1
+                        elif history_menu_iter2 == 2:
+                            page -= 1
+                            if page < 0:
+                                page = 0
+                        elif history_menu_iter2 == 3:
+                            break
+
+                elif history_menu_iter == 3:
+                    break
+
+        elif user_id > 0 and itr == 5:
             print("회원 탈퇴를 진행하시겠습니까?")
             print("1. Yes")
             print("2. No")
@@ -348,11 +483,9 @@ if __name__ == '__main__':
                 user_id = -1
                 print("탈퇴 완료")
 
-        elif (user_id < 0 and itr == 4) or (user_id > 0 and itr == 5):
+        elif (user_id < 0 and itr == 4) or (user_id > 0 and itr == 6):
             print("------------------------------")
-            print()
             print("[ Bye ]")
-            print()
             print("------------------------------")
             break
 
