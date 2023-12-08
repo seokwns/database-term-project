@@ -1,3 +1,5 @@
+import psycopg2.extensions
+
 
 class BookmarkRepository:
     def __init__(self, connection, cursor):
@@ -116,21 +118,28 @@ class BookmarkRepository:
         return self.cursor.fetchall()
 
     def delete(self, user_id, url):
-        sql = '''
-                begin;
-                
-                delete from memo_tb m
-                where m.bookmark_id in (
-                    select b.id
-                    from bookmark_tb b
-                    where b.user_id = %s and b.url = %s
-                );
-                
-                delete from bookmark_tb
-                where user_id = %s and url = %s;
-                
-                commit;
-        '''
+        self.connection.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_SERIALIZABLE)
 
-        self.cursor.execute(sql, (user_id, url, user_id, url, ))
-        self.connection.commit()
+        try:
+            sql = '''
+                    begin;
+                    
+                    delete from memo_tb m
+                    where m.bookmark_id in (
+                        select b.id
+                        from bookmark_tb b
+                        where b.user_id = %s and b.url = %s
+                    );
+                    
+                    delete from bookmark_tb
+                    where user_id = %s and url = %s;
+                    
+                    commit;
+            '''
+
+            self.cursor.execute(sql, (user_id, url, user_id, url, ))
+            self.connection.commit()
+
+        except Exception as e:
+            self.connection.rollback()
+            raise e

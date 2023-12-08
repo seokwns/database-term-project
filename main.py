@@ -95,29 +95,41 @@ if __name__ == '__main__':
             print("|  회원가입 정보를 기입해주세요.                                                  |")
             print("|  - 이름은 2글자 이상, 10글자 이하만 가능합니다.                                 |")
             print("|  - 비밀번호는 영문자, 숫자, 특수문자 포함 8글자 이상, 30글자 이하만 가능합니다. |")
+            print("|  - 회원가입을 취소할 경우, \quit을 입력해주세요.                                |")
             print("+---------------------------------------------------------------------------------+")
 
             while True:
                 email = input(" > email: ")
+                if email == '\\quit':
+                    break
+
                 name = input(" > name: ")
+                if name == '\\quit':
+                    break
+
                 password = input(" > password: ")
+                if password == '\\quit':
+                    break
 
                 registered = user_service.register(email, name, password)
 
                 if registered is True:
+                    print("+--------------------------------------------------------------------------------+")
+                    print("|                                 회원가입 완료                                  |")
+                    print("+--------------------------------------------------------------------------------+")
                     break
-
-            print("+--------------------------------------------------------------------------------+")
-            print("|                                 회원가입 완료                                  |")
-            print("+--------------------------------------------------------------------------------+")
 
         elif user_id < 0 and itr == 2:
             print("+-------------------------------------------------+")
             print("|                     로그인                      |")
             print("+-------------------------------------------------+")
             print("|  로그인 정보를 입력해주세요.                    |")
+            print("|  이메일에 \quit을 입력하면 메뉴로 돌아갑니다.   |")
             print("+-------------------------------------------------+")
             email = input(" > email: ")
+            if email == '\\quit':
+                continue
+
             password = input(" > password: ")
 
             user_id = user_service.login(email, password)
@@ -189,7 +201,7 @@ if __name__ == '__main__':
                     print("      북마크 수 :", bookmark_count)
                     print("      광고 여부 :", value.advertisement)
                     print("      신뢰도 :", value.confidence)
-                    print("+-------------------------------------------------+")
+                    print()
 
                 go_back = False
 
@@ -231,7 +243,7 @@ if __name__ == '__main__':
 
                     elif menu_iter == 3:
                         print("+-------------------------------------------------+")
-                        print("|  방문할 URL을 선택해주세요.                     |")
+                        print("|  방문할 URL을 선택해주세요. (1~10)              |")
                         print("+-------------------------------------------------+")
 
                         while True:
@@ -239,7 +251,7 @@ if __name__ == '__main__':
                                 url_idx = int(input(" > "))
                                 if 1 <= url_idx <= 10:
                                     opened_post = search_response[url_idx - 1]
-                                    webbrowser.open_new(opened_post.url)
+                                    webbrowser.open_new(opened_post.link)
                                     break
                                 else:
                                     print("+-------------------------------------------------+")
@@ -342,13 +354,11 @@ if __name__ == '__main__':
                             break
 
                         for (idx, value) in enumerate(bookmarks):
-                            print("+-------------------------------------------------+")
                             print(f'{idx + 1}.')
                             print("   url :", value.url)
                             print("   title :", value.title)
                             print("   content :", value.memo_content)
                             print("   created at :", value.memo_created_at)
-                            print("+-------------------------------------------------+")
 
                         print("+-------------------------------------------------+")
                         print("|                   북마크 메뉴                   |")
@@ -460,13 +470,12 @@ if __name__ == '__main__':
                             continue
 
                     for (idx, value) in enumerate(responses):
-                        print("+--------------------------------------------------------------+")
                         print(f'   {idx + 1}.')
                         print("      url :", value.url)
                         print("      title :", value.title)
                         print("      content :", value.memo_content)
                         print("      created at :", value.memo_created_at)
-                        print("+--------------------------------------------------------------+")
+                        print()
 
                 elif bookmark_iter == 5:
                     break
@@ -507,7 +516,7 @@ if __name__ == '__main__':
                             histories = history_service.find_by_user_id(user_id, page)
                         elif history_menu_iter == 2:
                             history_keyword = input(" > keyword : ")
-                            print("+--------------------------------------------------------------+")
+                            print()
                             histories = history_service.find_by_user_id_and_keyword(user_id, history_keyword, page)
 
                         for (idx, value) in enumerate(histories):
@@ -515,7 +524,7 @@ if __name__ == '__main__':
                             print("      키워드 =", value.keyword)
                             print("      페이지 =", value.page)
                             print("      날짜 =", value.searched_at)
-                            print("+--------------------------------------------------------------+")
+                            print()
 
                         print("+-------------------------------------------------+")
                         print("|                  검색기록 메뉴                  |")
