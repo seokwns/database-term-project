@@ -1,5 +1,5 @@
 from .repository import UserRepository
-from .utils import Utils
+from .user_utils import Utils
 
 
 class UserService:
@@ -41,4 +41,4 @@ class UserService:
         return -1
 
     def delete(self, user_id):
-        self.user_repository.delete_user(user_id)
+        return self.user_repository.delete_user(user_id)

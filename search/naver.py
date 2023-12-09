@@ -4,7 +4,7 @@ from .html_parser import parse_html
 from .html_parser import extract_text_from_items
 
 
-def search_keyword(connection, cursor, keyword, number):
+def search_keyword(connection, keyword, number):
     client_id = '_________________'
     client_secret = '__________________'
     headers = {'X-Naver-Client-Id': 'YoL5w1HC7dqiP6qgYOqn', 'X-Naver-Client-Secret': 'ybbtS8rMQN'}

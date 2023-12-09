@@ -67,10 +67,6 @@ class BookmarkService:
             print("로그인을 해주세요.")
             return None
 
-        if len(keyword) == 0:
-            print("키워드를 입력해주세요.")
-            return None
-
         responses = self.bookmark_repository.find_in_title_and_memo(user_id, keyword)
         dtos = []
 

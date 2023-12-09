@@ -91,6 +91,7 @@ class UserRepository:
 
             self.cursor.execute(sql, (user_id, user_id, user_id, user_id, ))
             self.connection.commit()
+            return True
 
         except Exception as e:
             self.connection.rollback()
