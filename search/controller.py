@@ -121,14 +121,19 @@ class SearchController:
         print("|  1. Yes                                         |")
         print("|  2. No                                          |")
         print("+-------------------------------------------------+")
-        memo_iter = Utils.get_integer(2)
+        memo_menu_iterator = Utils.get_integer(2)
+        content = ""
 
-        if memo_iter == 1:
+        if memo_menu_iterator == 1:
             content = input(" > content: ")
-            self.memo_service.save(user_id, bookmark_id, content)
             print("+-------------------------------------------------+")
             print("|                    저장 완료                    |")
             print("+-------------------------------------------------+")
+
+        elif memo_menu_iterator == 2:
+            content = ""
+
+        self.memo_service.save(user_id, bookmark_id, content)
 
     @staticmethod
     def open_url(search_response):

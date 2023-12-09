@@ -8,11 +8,11 @@ class Utils:
                     break
                 else:
                     print("+-------------------------------------------------+")
-                    print(f"|  {min_number}~{max_number} 사이 숫자만 입력해주세요.                  |")
+                    print(f"|  {min_number}~{' ' if max_number < 10 else ''}{max_number} 사이 숫자만 입력해주세요.                 |")
                     print("+-------------------------------------------------+")
             except ValueError:
                 print("+-------------------------------------------------+")
-                print(f"|  {min_number}~{max_number} 사이 숫자만 입력해주세요.                  |")
+                print(f"|  {min_number}~{' ' if max_number < 10 else ''}{max_number} 사이 숫자만 입력해주세요.                 |")
                 print("+-------------------------------------------------+")
                 continue
 

@@ -1,11 +1,10 @@
-from .repository import UserRepository
 from .user_utils import Utils
 
 
 class UserService:
 
-    def __init__(self, connection, cursor):
-        self.user_repository = UserRepository(connection, cursor)
+    def __init__(self, user_repository):
+        self.user_repository = user_repository
 
     def register(self, email, name, password):
         email_exists = self.user_repository.check_email_exists(email)

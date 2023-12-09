@@ -1,9 +1,16 @@
 import psycopg2
 from utils import Utils
+
+from user.repository import UserRepository
+from bookmark.repository import BookmarkRepository
+from memo.repository import MemoRepository
+from history.repository import HistoryRepository
+
 from user.controller import UserController
 from search.controller import SearchController
 from bookmark.controller import BookmarkController
 from history.controller import HistoryController
+
 from user.service import UserService
 from bookmark.service import BookmarkService
 from memo.service import MemoService
@@ -21,10 +28,15 @@ if __name__ == '__main__':
 
     cursor = connection.cursor()
 
-    user_service = UserService(connection, cursor)
-    bookmark_service = BookmarkService(connection, cursor)
-    memo_service = MemoService(connection, cursor)
-    history_service = HistoryService(connection, cursor)
+    user_repository = UserRepository(connection, cursor)
+    bookmark_repository = BookmarkRepository(connection, cursor)
+    memo_repository = MemoRepository(connection, cursor)
+    history_repository = HistoryRepository(connection, cursor)
+
+    user_service = UserService(user_repository)
+    bookmark_service = BookmarkService(bookmark_repository)
+    memo_service = MemoService(memo_repository)
+    history_service = HistoryService(history_repository)
 
     user_controller = UserController(connection, cursor, user_service)
     search_controller = SearchController(connection, cursor, bookmark_service, memo_service, history_service)

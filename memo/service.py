@@ -1,11 +1,6 @@
-from .repository import MemoRepository
-
-
 class MemoService:
-    def __init__(self, connection, cursor):
-        self.connection = connection
-        self.cursor = cursor
-        self.memo_repository = MemoRepository(connection, cursor)
+    def __init__(self, memo_repository):
+        self.memo_repository = memo_repository
 
     def save(self, user_id, bookmark_id, content):
         self.memo_repository.save(user_id, bookmark_id, content)

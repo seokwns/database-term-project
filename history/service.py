@@ -1,10 +1,9 @@
-from .repository import HistoryRepository
 from .history import History
 
 
 class HistoryService:
-    def __init__(self, connection, cursor):
-        self.history_repository = HistoryRepository(connection, cursor)
+    def __init__(self, history_repository):
+        self.history_repository = history_repository
 
     def save(self, user_id, keyword, page):
         if user_id == -1:

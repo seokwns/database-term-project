@@ -1,12 +1,9 @@
-from .repository import BookmarkRepository
 from .bookmark import Bookmark
 
 
 class BookmarkService:
-    def __init__(self, connection, cursor):
-        self.connection = connection
-        self.cursor = cursor
-        self.bookmark_repository = BookmarkRepository(connection, cursor)
+    def __init__(self, bookmark_repository):
+        self.bookmark_repository = bookmark_repository
 
     def save(self, post, user_id):
         if user_id < 1:
@@ -23,6 +20,7 @@ class BookmarkService:
             return None
 
         responses = self.bookmark_repository.find(user_id, page)
+        print(responses)
         dtos = []
 
         for response in responses:
