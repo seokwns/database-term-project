@@ -58,11 +58,11 @@ class BookmarkRepository:
                 from bookmark_tb b
                 left outer join memo_tb m on b.id = m.bookmark_id
                 where b.user_id = %s
-                limit 5
+                limit 10
                 offset %s
         '''
 
-        self.cursor.execute(sql, (user_id, page, ))
+        self.cursor.execute(sql, (user_id, page * 10, ))
         responses = self.cursor.fetchall()
 
         sql = '''
@@ -96,11 +96,11 @@ class BookmarkRepository:
                 left outer join memo_tb m on b.id = m.bookmark_id
                 where b.user_id = %s
                 order by b.created_at desc
-                limit 5
+                limit 10
                 offset %s               
         '''
 
-        self.cursor.execute(sql, (user_id, page, ))
+        self.cursor.execute(sql, (user_id, page * 10, ))
         responses = self.cursor.fetchall()
 
         sql = '''

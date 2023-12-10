@@ -1,3 +1,5 @@
+import math
+
 from utils import Utils
 
 
@@ -20,7 +22,7 @@ class HistoryController:
                 print()
                 histories, count = self.history_service.find_by_user_id_and_keyword(user_id, history_keyword, page)
 
-            max_page = count / 10
+            max_page = math.ceil(count / 10)
 
             for (idx, value) in enumerate(histories):
                 print(f'   {idx + 1}.')
@@ -41,11 +43,12 @@ class HistoryController:
 
             if history_menu_iter2 == 1:
                 page += 1
-                if page >= max_page:
+                if page > max_page:
                     page -= 1
                     print("+-------------------------------------------------+")
                     print("|  마지막 페이지 입니다.                          |")
                     print("+-------------------------------------------------+")
+
             elif history_menu_iter2 == 2:
                 page -= 1
                 if page < 0:
@@ -53,5 +56,6 @@ class HistoryController:
                     print("+-------------------------------------------------+")
                     print("|  첫번째 페이지 입니다.                          |")
                     print("+-------------------------------------------------+")
+
             elif history_menu_iter2 == 3:
                 break

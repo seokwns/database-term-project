@@ -1,3 +1,5 @@
+import math
+
 from utils import Utils
 
 
@@ -44,7 +46,7 @@ class BookmarkController:
                     print("+--------------------------------------------------------------+")
                     return
 
-            max_page = bookmark_count / 10
+            max_page = math.ceil(bookmark_count / 10)
 
             if len(bookmarks) == 0:
                 print("+-------------------------------------------------+")
@@ -127,33 +129,3 @@ class BookmarkController:
 
             elif menu_iter == 5:
                 break
-
-    def find_filtered_bookmark(self, user_id, bookmark_iter):
-        keyword = input(" > keyword: ")
-        responses = []
-
-        if bookmark_iter == 3:
-            responses = self.bookmark_service.find_in_title(user_id, keyword)
-
-            if len(responses) == 0:
-                print("+----------------------------------------------------+")
-                print("|  해당 키워드가 포함된 북마크가 존재하지 않습니다.  |")
-                print("+----------------------------------------------------+")
-                return
-
-        elif bookmark_iter == 4:
-            responses = self.bookmark_service.find_in_title_and_memo(user_id, keyword)
-
-            if len(responses) == 0:
-                print("+--------------------------------------------------------------+")
-                print("|  해당 키워드가 포함된 북마크 혹은 메모가 존재하지 않습니다.  |")
-                print("+--------------------------------------------------------------+")
-                return
-
-        for (idx, value) in enumerate(responses):
-            print(f'   {idx + 1}.')
-            print("      url :", value.url)
-            print("      title :", value.title)
-            print("      content :", value.memo_content)
-            print("      created at :", value.memo_created_at)
-            print()

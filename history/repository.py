@@ -42,11 +42,12 @@ class HistoryRepository:
                 select *
                 from history_tb h
                 where h.user_id = %s
+                order by searched_at desc
                 limit 10
                 offset %s
         '''
 
-        self.cursor.execute(sql, (user_id, page, ))
+        self.cursor.execute(sql, (user_id, page * 10, ))
         responses = self.cursor.fetchall()
 
         sql = '''
@@ -70,7 +71,7 @@ class HistoryRepository:
                 offset %s
         '''
 
-        self.cursor.execute(sql, (user_id, f'%{keyword}%', page, ))
+        self.cursor.execute(sql, (user_id, f'%{keyword}%', page * 10, ))
         responses = self.cursor.fetchall()
 
         sql = '''
