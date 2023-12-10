@@ -8,10 +8,22 @@ class BlogPostDTO:
         self.description = self.remove_html_tags(description)
         self.bloggername = bloggername
         self.bloggerlink = bloggerlink
+        self.bloggerid = self.get_blogger_id(bloggerlink)
         self.postdate = postdate
         self.advertisement = advertisement
         self.confidence = confidence
 
-    def remove_html_tags(self, input_string):
+    @staticmethod
+    def remove_html_tags(input_string):
         clean_text = re.sub('<.*?>', '', input_string)
         return clean_text
+
+    @staticmethod
+    def get_blogger_id(link):
+        blogger_id = ""
+
+        matcher = re.search(r'/([^/]+)$', link)
+        if matcher:
+            blogger_id = matcher.group(1)
+
+        return blogger_id

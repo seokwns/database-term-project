@@ -1,4 +1,7 @@
 import psycopg2
+import joblib
+from konlpy.tag import Mecab
+
 from utils import Utils
 
 from user.repository import UserRepository
@@ -17,6 +20,13 @@ from memo.service import MemoService
 from history.service import HistoryService
 
 
+mecab = Mecab()
+
+
+def mecab_tokenizer(text):
+    return mecab.morphs(text)
+
+
 if __name__ == '__main__':
     connection = psycopg2.connect(
         database='sample2023',
@@ -25,6 +35,9 @@ if __name__ == '__main__':
         host='::1',
         port='5432'
     )
+
+    count_vector = joblib.load('search/machine/count_vectorizer.pkl')
+    logistic_regression = joblib.load('search/machine/logistic_regression.pkl')
 
     cursor = connection.cursor()
 
@@ -39,7 +52,7 @@ if __name__ == '__main__':
     history_service = HistoryService(history_repository)
 
     user_controller = UserController(connection, cursor, user_service)
-    search_controller = SearchController(connection, cursor, bookmark_service, memo_service, history_service)
+    search_controller = SearchController(connection, cursor, bookmark_service, memo_service, history_service, count_vector, logistic_regression)
     bookmark_controller = BookmarkController(connection, cursor, bookmark_service, memo_service)
     history_controller = HistoryController(connection, cursor, history_service)
 
@@ -49,7 +62,7 @@ if __name__ == '__main__':
 
         if user_id < 0:
             print("+-------------------------------------------------+")
-            print("|                     mat-zip                     |")
+            print("|                  see-realview                   |")
             print("+-------------------------------------------------+")
             print("|  1. 회원가입                                    |")
             print("|  2. 로그인                                      |")
@@ -58,7 +71,7 @@ if __name__ == '__main__':
             print("+-------------------------------------------------+")
         else:
             print("+-------------------------------------------------+")
-            print("|                     mat-zip                     |")
+            print("|                  see-realview                   |")
             print("+-------------------------------------------------+")
             print("|  1. 로그아웃                                    |")
             print("|  2. 맛집 검색하기                               |")
@@ -132,9 +145,10 @@ if __name__ == '__main__':
             print("|  1. Yes                                         |")
             print("|  2. No                                          |")
             print("+-------------------------------------------------+")
-            delete_iter = Utils.get_integer(2)
 
-            if delete_iter == 1:
+            delete_menu_iterator = Utils.get_integer(2)
+
+            if delete_menu_iterator == 1:
                 user_id = user_controller.withdraw(user_id)
 
         elif (user_id < 0 and main_menu_iterator == 4) or (user_id > 0 and main_menu_iterator == 6):

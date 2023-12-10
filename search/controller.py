@@ -5,12 +5,14 @@ from utils import Utils
 
 
 class SearchController:
-    def __init__(self, connection, cursor, bookmark_service, memo_service, history_service):
+    def __init__(self, connection, cursor, bookmark_service, memo_service, history_service, vectorizer, model):
         self.connection = connection
         self.cursor = cursor
         self.bookmark_service = bookmark_service
         self.memo_service = memo_service
         self.history_service = history_service
+        self.vectorizer = vectorizer
+        self.model = model
 
     @staticmethod
     def format_date_string(input_string):
@@ -52,7 +54,7 @@ class SearchController:
             print("+-------------------------------------------------+")
             print()
             self.history_service.save(user_id, keyword, number)
-            search_response = search_keyword(keyword, keyword, number)
+            search_response = search_keyword(keyword, number, self.vectorizer, self.model)
 
             urls = []
 
@@ -159,5 +161,5 @@ class SearchController:
             print("      날짜 :", self.format_date_string(value.postdate))
             print("      북마크 수 :", bookmark_count)
             print("      광고 여부 :", value.advertisement)
-            print("      신뢰도 :", value.confidence)
+            print("      신뢰도 [False, True] :", value.confidence)
             print()

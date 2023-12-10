@@ -5,8 +5,7 @@ from bs4 import BeautifulSoup
 def parse_html(request):
     splits = request.link.split("/")
     post_id = splits[-1]
-    post_url = f"https://blog.naver.com/PostView.naver?blogId={request.bloggername}&logNo={post_id}"
-
+    post_url = f"https://blog.naver.com/PostView.naver?blogId={request.bloggerid}&logNo={post_id}"
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
                       'Chrome/58.0.3029.110 Safari/537.36'
@@ -32,7 +31,7 @@ def parse_html(request):
 
 def extract_text_from_items(items):
     if not items:
-        return None
+        return ""
 
     text_list = [item.get_text() for item in items]
 
