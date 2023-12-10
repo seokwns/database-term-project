@@ -161,5 +161,5 @@ class SearchController:
             print("      날짜 :", self.format_date_string(value.postdate))
             print("      북마크 수 :", bookmark_count)
             print("      광고 여부 :", value.advertisement)
-            print("      신뢰도 :", value.confidence)
+            print(f"      신뢰도 : {value.confidence:.2f}%")
             print()
