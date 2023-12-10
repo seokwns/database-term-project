@@ -8,7 +8,7 @@ from .html_parser import extract_text_from_items
 def search_keyword(keyword, number, vectorizer, model):
     client_id = '_________________'
     client_secret = '__________________'
-    headers = {'X-Naver-Client-Id': 'YoL5w1HC7dqiP6qgYOqn', 'X-Naver-Client-Secret': 'ybbtS8rMQN'}
+    headers = {'X-Naver-Client-Id': 'your-id', 'X-Naver-Client-Secret': 'your-secret'}
 
     base_url = "https://openapi.naver.com/v1/search/blog.json?query="
     cursor = "$&start="
