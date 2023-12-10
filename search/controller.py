@@ -30,11 +30,15 @@ class SearchController:
         print("|                   맛집 검색                     |")
         print("+-------------------------------------------------+")
         print("|  키워드를 입력해주세요.                         |")
+        print("|  \\quit을 입력하면 메인 메뉴로 돌아갑니다.       |")
         print("+-------------------------------------------------+")
 
         while True:
             try:
                 keyword = input(" > keyword: ")
+                if keyword == "\\quit":
+                    return
+
                 number = int(input(" > 페이지: "))
                 if 1 <= number:
                     break
@@ -111,7 +115,7 @@ class SearchController:
         print("+-------------------------------------------------+")
         print("|          포스트 번호를 입력해주세요.            |")
         print("+-------------------------------------------------+")
-        post_idx = Utils.get_integer(10)
+        post_idx = Utils.get_integer(len(search_response))
 
         selected_post = search_response[post_idx - 1]
         bookmark_id = self.bookmark_service.save(selected_post, user_id)
@@ -140,9 +144,9 @@ class SearchController:
     @staticmethod
     def open_url(search_response):
         print("+-------------------------------------------------+")
-        print("|  방문할 URL을 선택해주세요. (1~10)              |")
+        print(f"|  방문할 URL을 선택해주세요. (1~{len(search_response)})              |")
         print("+-------------------------------------------------+")
-        url_idx = Utils.get_integer(10)
+        url_idx = Utils.get_integer(len(search_response))
         opened_post = search_response[url_idx - 1]
         webbrowser.open_new(opened_post.link)
 

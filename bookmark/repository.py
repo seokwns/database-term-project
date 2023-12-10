@@ -63,7 +63,18 @@ class BookmarkRepository:
         '''
 
         self.cursor.execute(sql, (user_id, page, ))
-        return self.cursor.fetchall()
+        responses = self.cursor.fetchall()
+
+        sql = '''
+                select count(*)
+                from bookmark_tb
+                where user_id = %s        
+        '''
+
+        self.cursor.execute(sql, (user_id, ))
+        bookmark_count = self.cursor.fetchone()
+
+        return responses, bookmark_count
 
     def find_all_by_urls_in(self, urls):
         url_str = ','.join(map(lambda x: f"'{x}'", urls))
@@ -90,7 +101,18 @@ class BookmarkRepository:
         '''
 
         self.cursor.execute(sql, (user_id, page, ))
-        return self.cursor.fetchall()
+        responses = self.cursor.fetchall()
+
+        sql = '''
+                select count(*)
+                from bookmark_tb
+                where user_id = %s        
+        '''
+
+        self.cursor.execute(sql, (user_id,))
+        bookmark_count = self.cursor.fetchone()
+
+        return responses, bookmark_count
 
     def find_in_title(self, user_id, keyword):
         sql = '''
@@ -102,7 +124,18 @@ class BookmarkRepository:
         '''
 
         self.cursor.execute(sql, (user_id, f'{"%" + keyword + "%"}', ))
-        return self.cursor.fetchall()
+        responses = self.cursor.fetchall()
+
+        sql = '''
+                select count(*)
+                from bookmark_tb
+                where user_id = %s and title like %s
+        '''
+
+        self.cursor.execute(sql, (user_id, f'{"%" + keyword + "%"}', ))
+        bookmark_count = self.cursor.fetchone()
+
+        return responses, bookmark_count
 
     def find_in_title_and_memo(self, user_id, keyword):
         sql = '''
@@ -115,7 +148,18 @@ class BookmarkRepository:
         '''
 
         self.cursor.execute(sql, (user_id, f'{"%" + keyword + "%"}', f'{"%" + keyword + "%"}', ))
-        return self.cursor.fetchall()
+        responses = self.cursor.fetchall()
+
+        sql = '''
+                select count(*)
+                from bookmark_tb
+                where user_id = %s and title like %s
+        '''
+
+        self.cursor.execute(sql, (user_id, f'{"%" + keyword + "%"}', ))
+        bookmark_count = self.cursor.fetchone()
+
+        return responses, bookmark_count
 
     def delete(self, user_id, url):
         self.connection.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_SERIALIZABLE)

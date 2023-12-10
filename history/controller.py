@@ -9,15 +9,18 @@ class HistoryController:
 
     def find_histories(self, user_id, history_menu_iter):
         page = 0
+        max_page = 0
         while True:
             histories = []
 
             if history_menu_iter == 1:
-                histories = self.history_service.find_by_user_id(user_id, page)
+                histories, count = self.history_service.find_by_user_id(user_id, page)
             elif history_menu_iter == 2:
                 history_keyword = input(" > keyword : ")
                 print()
-                histories = self.history_service.find_by_user_id_and_keyword(user_id, history_keyword, page)
+                histories, count = self.history_service.find_by_user_id_and_keyword(user_id, history_keyword, page)
+
+            max_page = count / 10
 
             for (idx, value) in enumerate(histories):
                 print(f'   {idx + 1}.')
@@ -38,9 +41,17 @@ class HistoryController:
 
             if history_menu_iter2 == 1:
                 page += 1
+                if page >= max_page:
+                    page -= 1
+                    print("+-------------------------------------------------+")
+                    print("|  마지막 페이지 입니다.                          |")
+                    print("+-------------------------------------------------+")
             elif history_menu_iter2 == 2:
                 page -= 1
                 if page < 0:
                     page = 0
+                    print("+-------------------------------------------------+")
+                    print("|  첫번째 페이지 입니다.                          |")
+                    print("+-------------------------------------------------+")
             elif history_menu_iter2 == 3:
                 break

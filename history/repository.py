@@ -47,7 +47,18 @@ class HistoryRepository:
         '''
 
         self.cursor.execute(sql, (user_id, page, ))
-        return self.cursor.fetchall()
+        responses = self.cursor.fetchall()
+
+        sql = '''
+                select count(*)
+                from history_tb
+                where user_id = %s
+        '''
+
+        self.cursor.execute(sql, (user_id, ))
+        count = self.cursor.fetchone()
+
+        return responses, count
 
     def find_by_user_id_and_keyword(self, user_id, keyword, page):
         sql = '''
@@ -60,4 +71,15 @@ class HistoryRepository:
         '''
 
         self.cursor.execute(sql, (user_id, f'%{keyword}%', page, ))
-        return self.cursor.fetchall()
+        responses = self.cursor.fetchall()
+
+        sql = '''
+                select count(*)
+                from history_tb 
+                where user_id = %s and keyword like %s
+        '''
+
+        self.cursor.execute(sql, (user_id, keyword, ))
+        count = self.cursor.fetchone()
+
+        return responses, count

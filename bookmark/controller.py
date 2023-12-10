@@ -10,12 +10,41 @@ class BookmarkController:
 
     def find_bookmarks(self, user_id, bookmark_iter):
         page = 0
+        max_page = 0
+        keyword = ""
+
+        if bookmark_iter == 3 or bookmark_iter == 4:
+            keyword = input(" > keyword: ")
+
         while True:
             bookmarks = []
+            bookmark_count = 0
+
             if bookmark_iter == 1:
-                bookmarks = self.bookmark_service.find(user_id, page)
+                bookmarks, bookmark_count = self.bookmark_service.find(user_id, page)
+
             elif bookmark_iter == 2:
-                bookmarks = self.bookmark_service.find_order_by_date(user_id, page)
+                bookmarks, bookmark_count = self.bookmark_service.find_order_by_date(user_id, page)
+
+            elif bookmark_iter == 3:
+                bookmarks, bookmark_count = self.bookmark_service.find_in_title(user_id, keyword)
+
+                if len(bookmarks) == 0:
+                    print("+----------------------------------------------------+")
+                    print("|  해당 키워드가 포함된 북마크가 존재하지 않습니다.  |")
+                    print("+----------------------------------------------------+")
+                    return
+
+            elif bookmark_iter == 4:
+                bookmarks, bookmark_count = self.bookmark_service.find_in_title_and_memo(user_id, keyword)
+
+                if len(bookmarks) == 0:
+                    print("+--------------------------------------------------------------+")
+                    print("|  해당 키워드가 포함된 북마크 혹은 메모가 존재하지 않습니다.  |")
+                    print("+--------------------------------------------------------------+")
+                    return
+
+            max_page = bookmark_count / 10
 
             if len(bookmarks) == 0:
                 print("+-------------------------------------------------+")
@@ -43,20 +72,28 @@ class BookmarkController:
 
             if menu_iter == 1:
                 page += 1
+                if page > max_page:
+                    print("+-------------------------------------------------+")
+                    print("|  마지막 페이지 입니다.                          |")
+                    print("+-------------------------------------------------+")
+                    page -= 1
                 continue
 
             elif menu_iter == 2:
                 page -= 1
                 if page < 0:
+                    print("+-------------------------------------------------+")
+                    print("|  첫번쨰 페이지 입니다.                          |")
+                    print("+-------------------------------------------------+")
                     page = 0
                 continue
 
             elif menu_iter == 3:
                 print("+-------------------------------------------------+")
-                print("|  삭제할 북마크 번호를 입력해주세요. (1~10)      |")
+                print(f"|  삭제할 북마크 번호를 입력해주세요. (1~{len(bookmarks)})      |")
                 print("|  취소할 경우 0을 입력해주세요.                  |")
                 print("+-------------------------------------------------+")
-                bookmark_idx = Utils.get_integer(10, 0)
+                bookmark_idx = Utils.get_integer(len(bookmarks), 0)
 
                 if bookmark_idx == 0:
                     continue
@@ -67,10 +104,10 @@ class BookmarkController:
 
             elif menu_iter == 4:
                 print("+-------------------------------------------------+")
-                print("|  수정할 북마크 번호를 입력해주세요. (1~10)      |")
+                print(f"|  수정할 북마크 번호를 입력해주세요. (1~{len(bookmarks):2d})      |")
                 print("|  취소할 경우 0을 입력해주세요.                  |")
                 print("+-------------------------------------------------+")
-                selected_memo_idx = Utils.get_integer(10, 0)
+                selected_memo_idx = Utils.get_integer(len(bookmarks), 0)
 
                 if selected_memo_idx == 0:
                     break

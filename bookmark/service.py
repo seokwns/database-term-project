@@ -19,14 +19,13 @@ class BookmarkService:
             print("로그인을 해주세요.")
             return None
 
-        responses = self.bookmark_repository.find(user_id, page)
-        print(responses)
+        responses, bookmark_count = self.bookmark_repository.find(user_id, page)
         dtos = []
 
         for response in responses:
             dtos.append(Bookmark(response))
 
-        return dtos
+        return dtos, bookmark_count[0]
 
     def find_order_by_date(self, user_id, page):
         if user_id < 1:
@@ -34,13 +33,13 @@ class BookmarkService:
             print("로그인을 해주세요.")
             return None
 
-        responses = self.bookmark_repository.find_order_by_date(user_id, page)
+        responses, bookmark_count = self.bookmark_repository.find_order_by_date(user_id, page)
         dtos = []
 
         for response in responses:
             dtos.append(Bookmark(response))
 
-        return dtos
+        return dtos, bookmark_count[0]
 
     def find_all_by_urls_in(self, urls):
         return self.bookmark_repository.find_all_by_urls_in(urls)
@@ -51,13 +50,13 @@ class BookmarkService:
             print("로그인을 해주세요.")
             return None
 
-        responses = self.bookmark_repository.find_in_title(user_id, keyword)
+        responses, bookmark_count = self.bookmark_repository.find_in_title(user_id, keyword)
         dtos = []
 
         for response in responses:
             dtos.append(Bookmark(response))
 
-        return dtos
+        return dtos, bookmark_count[0]
 
     def find_in_title_and_memo(self, user_id, keyword):
         if user_id < 1:
@@ -65,13 +64,13 @@ class BookmarkService:
             print("로그인을 해주세요.")
             return None
 
-        responses = self.bookmark_repository.find_in_title_and_memo(user_id, keyword)
+        responses, bookmark_count = self.bookmark_repository.find_in_title_and_memo(user_id, keyword)
         dtos = []
 
         for response in responses:
             dtos.append(Bookmark(response))
 
-        return dtos
+        return dtos, bookmark_count[0]
 
     def delete(self, user_id, url):
         if user_id < 1:
