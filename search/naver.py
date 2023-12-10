@@ -18,7 +18,7 @@ def search_keyword(keyword, number, vectorizer, model):
     response = requests.get(url, headers=headers).json()
     posts = parse_json(response)
 
-    for post in posts:
+    for (idx, post) in enumerate(posts):
         items = parse_html(post)
         text = extract_text_from_items(items)
 
@@ -28,7 +28,13 @@ def search_keyword(keyword, number, vectorizer, model):
         prediction_probabilities = model.predict_proba(tokenized)[0]
 
         post.advertisement = prediction
-        post.confidence = prediction_probabilities
+
+        if prediction:
+            post.confidence = prediction_probabilities[1] * 100
+        else:
+            post.confidence = prediction_probabilities[0] * 100
+
+        print(f"{idx + 1}개 분석 완료")
 
     return posts
 
