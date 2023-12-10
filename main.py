@@ -110,7 +110,7 @@ if __name__ == '__main__':
 
                 bookmark_menu_iterator = Utils.get_integer(5)
 
-                if bookmark_menu_iterator == 1 or bookmark_menu_iterator == 2 or bookmark_menu_iterator == 3 or bookmark_menu_iterator == 4:
+                if 1 <= bookmark_menu_iterator <= 4:
                     bookmark_controller.find_bookmarks(user_id, bookmark_menu_iterator)
 
                 elif bookmark_menu_iterator == 5:
