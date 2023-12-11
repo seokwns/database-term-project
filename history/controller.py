@@ -25,10 +25,10 @@ class HistoryController:
             max_page = math.ceil(count / 10)
 
             for (idx, value) in enumerate(histories):
-                print(f'   {idx + 1}.')
-                print("      키워드 =", value.keyword)
-                print("      페이지 =", value.page)
-                print("      날짜 =", value.searched_at)
+                print(f'\t{idx + 1}.')
+                print("\t\t키워드 =", value.keyword)
+                print("\t\t페이지 =", value.page)
+                print("\t\t날짜 =", value.searched_at)
                 print()
 
             print("+-------------------------------------------------+")

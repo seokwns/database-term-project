@@ -1,4 +1,5 @@
 import webbrowser
+import textwrap
 
 from search.naver import search_keyword
 from utils import Utils
@@ -158,12 +159,13 @@ class SearchController:
                 if b[0] == value.link:
                     bookmark_count = b[1]
 
-            print(f"   {idx + 1}.")
-            print("      제목 :", value.title)
-            print("      미리보기 :", value.description)
-            print("      링크 :", value.link)
-            print("      날짜 :", self.format_date_string(value.postdate))
-            print("      북마크 수 :", bookmark_count)
-            print("      광고 여부 :", value.advertisement)
-            print(f"      신뢰도 : {value.confidence:.2f}%")
+            print(f"\t{idx + 1}.")
+            print("\t\t제목 :", value.title)
+            wrapped_description = textwrap.fill(value.description, 30)
+            print("\t\t미리보기 :\n", '\n'.join(['\t\t\t\t' + line for line in wrapped_description.split('\n')]))
+            print("\t\t링크 :", value.link)
+            print("\t\t날짜 :", self.format_date_string(value.postdate))
+            print("\t\t북마크 수 :", bookmark_count)
+            print("\t\t광고 여부 :", value.advertisement)
+            print(f"\t\t신뢰도 : {value.confidence:.2f}%")
             print()

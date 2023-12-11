@@ -55,11 +55,11 @@ class BookmarkController:
                 break
 
             for (idx, value) in enumerate(bookmarks):
-                print(f'{idx + 1}.')
-                print("   url :", value.url)
-                print("   title :", value.title)
-                print("   content :", value.memo_content)
-                print("   created at :", value.memo_created_at)
+                print(f'\t{idx + 1}.')
+                print("\t\turl :", value.url)
+                print("\t\ttitle :", value.title)
+                print("\t\tcontent :", value.memo_content)
+                print("\t\tcreated at :", value.memo_created_at)
 
             print("+-------------------------------------------------+")
             print("|                   북마크 메뉴                   |")
